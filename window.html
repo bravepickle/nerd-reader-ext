@@ -14,9 +14,9 @@
         }
 
         .content article {
-            background-color: black;
+            background-color: gainsboro;
             padding: 10px;
-            color: blue;
+            color: black;
             font-size: 16px;
             font-family: Verdana, Georgia, Monaco, serif;
         }
@@ -32,6 +32,10 @@
 
         .footer {
             margin-top: 10px;
+        }
+
+        #show_btn {
+            margin-left: 10px;
         }
     </style>
 </head>
@@ -60,8 +64,8 @@
             <label for="f_font_color">Font color</label>
             <select name="font_color" id="f_font_color">
                 <option value="beige">beige</option>
-                <option value="black">black</option>
-                <option value="blue" selected>blue</option>
+                <option value="black" selected>black</option>
+                <option value="blue">blue</option>
                 <option value="chartreuse">chartreuse</option>
                 <option value="cornflowerblue">cornflowerblue</option>
                 <option value="darkgrey">darkgrey</option>
@@ -76,19 +80,22 @@
             <label for="f_back_color">Font color</label>
             <select name="back_color" id="f_back_color">
                 <option value="beige">beige</option>
-                <option value="black" selected>black</option>
+                <option value="black">black</option>
                 <option value="blue">blue</option>
                 <option value="cornflowerblue">cornflowerblue</option>
                 <option value="darkgrey">darkgrey</option>
                 <option value="darkslategray">darkslategray</option>
                 <option value="deepskyblue">deepskyblue</option>
-                <option value="gainsboro">gainsboro</option>
+                <option value="gainsboro" selected>gainsboro</option>
                 <option value="white">white</option>
             </select>
         </div>
 
         <div class="footer">
             <button type="button" id="hide_btn">Close</button>
+            <button type="button" id="paste_btn">Paste From Clipboard</button>
+            <button type="button" id="paste_clean_btn">Paste Clean From Clipboard</button>
+            <button type="button" id="edit_content_btn">Edit Content</button>
         </div>
     </form>
     <button style="display: none;" type="button" id="show_btn">Edit</button>
@@ -96,7 +103,7 @@
     <article id="read_content">
         <h1>Some text</h1>
         <p>Some values
-        <p>Lorem ipsum@! 123459809
+        <p>Lorem ipsum! 123459809
     </article>
 </div>
 <script type="text/javascript" src="window.js"></script>

@@ -8,6 +8,12 @@
             width: 770px;
             height: 570px;
         }
+
+        .content article {
+            padding: 10px;
+            font-size: 16px;
+            font-family: Verdana, Georgia, Monaco, serif;
+        }
     </style>
 </head>
 <body>
@@ -29,7 +35,11 @@
         </p>
 
         <button type="submit">Open In Window</button>
+        <button type="button" id="paste_btn">Paste From Clipboard</button>
+        <button type="button" id="paste_clean_btn">Paste Clean From Clipboard</button>
+        <button type="button" id="edit_content_btn">Edit Content</button>
     </form>
+    <article id="read_content"></article>
 </div>
 <script type="text/javascript" src="popup.js"></script>
 </body>

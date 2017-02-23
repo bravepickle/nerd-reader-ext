@@ -1,12 +1,4 @@
 window.addEventListener('load', function () {
-    // var dimensions = top.location.hash.split(',');
-    // var isPopup = dimensions.length == 2; // true when is popup window is opened
-    // if (isPopup) {
-    //     window.resizeTo(dimensions[0], dimensions[1]);
-    // }
-
-    // var widthEl = document.getElementById('f_input_width');
-    // var heightEl = document.getElementById('f_input_height');
     var fontFamilyEl = document.getElementById('f_font_family');
     var fontSizeEl = document.getElementById('f_font_size');
     var fontColorEl = document.getElementById('f_font_color');
@@ -14,6 +6,16 @@ window.addEventListener('load', function () {
     var readEl = document.getElementById('read_content');
     var hideBtn = document.getElementById('hide_btn');
     var showBtn = document.getElementById('show_btn');
+    var pasteBtn = document.getElementById('paste_btn');
+    var pasteCleanBtn = document.getElementById('paste_clean_btn');
+    var editContentBtn = document.getElementById('edit_content_btn');
+
+    readEl.contentEditable = false;
+
+    // pass content from popup to window reader
+    if (sessionStorage.getItem('read_content')) {
+        readEl.innerHTML = sessionStorage.getItem('read_content');
+    }
 
     fontFamilyEl.addEventListener('change', function () {
         readEl.style.fontFamily = '"' + this.value + '", "Courier New", "Times New Roman"';
@@ -41,5 +43,52 @@ window.addEventListener('load', function () {
         this.style.display = 'none';
     });
 
+    pasteBtn.addEventListener('click', function () {
+        triggerEditContent();
+        readEl.focus();
+        readEl.innerHTML = '';
+        document.execCommand('paste');
+        triggerEditContent();
+    });
 
+    pasteCleanBtn.addEventListener('click', function () {
+        triggerEditContent();
+        readEl.focus();
+        readEl.innerHTML = '';
+        document.execCommand('paste');
+        readEl.innerHTML = readEl.innerText;
+        triggerEditContent();
+    });
+
+    function triggerEditContent() {
+        if (readEl.contentEditable == 'false') {
+            readEl.contentEditable = true;
+            readEl.style.border = '1px solid red';
+            editContentBtn.innerHTML = 'Stop Editing';
+
+            // avoid misuse of editor
+            pasteCleanBtn.disabled = true;
+            pasteBtn.disabled = true;
+        } else {
+            readEl.contentEditable = false;
+            readEl.style.border = 'none';
+            editContentBtn.innerHTML = 'Edit Content';
+            pasteCleanBtn.disabled = false;
+            pasteBtn.disabled = false;
+        }
+    }
+
+    editContentBtn.addEventListener('click', triggerEditContent);
+
+    document.body.onkeyup = function (ev) {
+        if (ev.code == 'Escape') {
+            var neo = new Event('click');
+
+            if (showBtn.style.display != 'none') {
+                showBtn.dispatchEvent(neo);
+            } else {
+                hideBtn.dispatchEvent(neo);
+            }
+        }
+    };
 });
