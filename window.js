@@ -82,6 +82,7 @@ window.addEventListener('load', function () {
         if (readEl.contentEditable == 'false') {
             readEl.contentEditable = true;
             readEl.style.border = '1px solid red';
+            readEl.focus();
             editContentBtn.innerHTML = 'Stop Editing';
 
             // avoid misuse of editor
@@ -109,6 +110,7 @@ window.addEventListener('load', function () {
         if (readEl.contentEditable == 'false') {
             readEl.contentEditable = true;
             readEl.style.border = '1px dashed red';
+            readEl.focus();
             editRawContentBtn.innerHTML = 'Stop Editing';
 
             buf = readEl.innerHTML;
@@ -160,6 +162,7 @@ window.addEventListener('load', function () {
         if (cssStylesEditorEl.style.display != 'block') {
             cssStylesEditorEl.innerText = cssStylesEl.innerHTML;
             cssStylesEditorEl.style.display = 'block';
+            cssStylesEditorEl.focus();
             this.innerHTML = 'Close CSS editor';
             readEl.style.display = 'none';
 

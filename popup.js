@@ -56,12 +56,14 @@ window.addEventListener('load', function () {
         if (readEl.contentEditable == 'false') {
             readEl.contentEditable = true;
             readEl.style.border = '1px solid red';
+            readEl.focus();
             editContentBtn.innerHTML = 'Stop Editing';
 
             // avoid misuse of editor
             pasteCleanBtn.disabled = true;
             pasteBtn.disabled = true;
             saveBtn.disabled = true;
+            cssBtn.disabled = true;
             editRawContentBtn.disabled = true;
         } else {
             readEl.contentEditable = false;
@@ -71,6 +73,7 @@ window.addEventListener('load', function () {
             pasteCleanBtn.disabled = false;
             pasteBtn.disabled = false;
             saveBtn.disabled = false;
+            cssBtn.disabled = false;
             editRawContentBtn.disabled = false;
         }
     }
@@ -81,6 +84,7 @@ window.addEventListener('load', function () {
         if (readEl.contentEditable == 'false') {
             readEl.contentEditable = true;
             readEl.style.border = '1px dashed red';
+            readEl.focus();
             editRawContentBtn.innerHTML = 'Stop Editing';
 
             buf = readEl.innerHTML;
@@ -89,6 +93,7 @@ window.addEventListener('load', function () {
             // avoid misuse of editor
             pasteCleanBtn.disabled = true;
             pasteBtn.disabled = true;
+            cssBtn.disabled = true;
             editContentBtn.disabled = true;
             saveBtn.disabled = true;
         } else {
@@ -101,6 +106,7 @@ window.addEventListener('load', function () {
 
             pasteCleanBtn.disabled = false;
             pasteBtn.disabled = false;
+            cssBtn.disabled = false;
             editContentBtn.disabled = false;
             saveBtn.disabled = false;
         }
@@ -122,6 +128,7 @@ window.addEventListener('load', function () {
         if (cssStylesEditorEl.style.display != 'block') {
             cssStylesEditorEl.innerText = cssStylesEl.innerHTML;
             cssStylesEditorEl.style.display = 'block';
+            cssStylesEditorEl.focus();
             this.innerHTML = 'Close CSS editor';
             readEl.style.display = 'none';
 
@@ -136,6 +143,7 @@ window.addEventListener('load', function () {
             cssStylesEditorEl.style.display = 'none';
             this.innerHTML = 'Edit CSS';
             readEl.style.display = 'block';
+
             // avoid misuse of editor
             pasteCleanBtn.disabled = false;
             pasteBtn.disabled = false;
