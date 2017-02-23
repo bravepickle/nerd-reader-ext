@@ -7,7 +7,16 @@ window.addEventListener('load', function () {
     var editRawContentBtn = document.getElementById('edit_raw_content_btn');
     var saveBtn = document.getElementById('save_btn');
     var readEl = document.getElementById('read_content');
+    var cssBtn = document.getElementById('css_btn');
+    var cssStylesEl = document.getElementById('custom_css');
+    var cssStylesEditorEl = document.getElementById('custom_css_editor');
+
     readEl.contentEditable = false;
+    cssStylesEditorEl.contentEditable = true;
+
+    if (localStorage.getItem('css_content')) {
+        cssStylesEl.innerHTML = localStorage.getItem('css_content');
+    }
 
     widthEl.addEventListener('change', function () {
         document.getElementById('f_output_width').innerHTML = this.value + ' px';
@@ -102,9 +111,37 @@ window.addEventListener('load', function () {
 
     saveBtn.addEventListener('click', function() {
         localStorage.setItem('read_content', readEl.innerHTML);
+        localStorage.setItem('css_content', cssStylesEl.innerHTML);
     });
 
     if (localStorage.getItem('read_content')) {
         readEl.innerHTML = localStorage.getItem('read_content'); // show last saved
     }
+
+    cssBtn.addEventListener('click', function() {
+        if (cssStylesEditorEl.style.display != 'block') {
+            cssStylesEditorEl.innerText = cssStylesEl.innerHTML;
+            cssStylesEditorEl.style.display = 'block';
+            this.innerHTML = 'Close CSS editor';
+            readEl.style.display = 'none';
+
+            // avoid misuse of editor
+            pasteCleanBtn.disabled = true;
+            pasteBtn.disabled = true;
+            saveBtn.disabled = true;
+            editContentBtn.disabled = true;
+            editRawContentBtn.disabled = true;
+        } else {
+            cssStylesEl.innerHTML = cssStylesEditorEl.innerText;
+            cssStylesEditorEl.style.display = 'none';
+            this.innerHTML = 'Edit CSS';
+            readEl.style.display = 'block';
+            // avoid misuse of editor
+            pasteCleanBtn.disabled = false;
+            pasteBtn.disabled = false;
+            saveBtn.disabled = false;
+            editContentBtn.disabled = false;
+            editRawContentBtn.disabled = false;
+        }
+    });
 });

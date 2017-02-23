@@ -11,8 +11,14 @@ window.addEventListener('load', function () {
     var pasteCleanBtn = document.getElementById('paste_clean_btn');
     var editContentBtn = document.getElementById('edit_content_btn');
     var editRawContentBtn = document.getElementById('edit_raw_content_btn');
+    var fontColorPicker = document.getElementById('font_color_picker');
+    var backgroundColorPicker = document.getElementById('back_color_picker');
+    var cssBtn = document.getElementById('css_btn');
+    var cssStylesEl = document.getElementById('custom_css');
+    var cssStylesEditorEl = document.getElementById('custom_css_editor');
 
     readEl.contentEditable = false;
+    cssStylesEditorEl.contentEditable = true;
 
     // pass content from popup to window reader
     if (sessionStorage.getItem('read_content')) {
@@ -22,20 +28,27 @@ window.addEventListener('load', function () {
         readEl.innerHTML = localStorage.getItem('read_content'); // show last saved
     }
 
+    if (localStorage.getItem('css_content')) {
+        cssStylesEl.innerHTML = localStorage.getItem('css_content');
+    }
+
     fontFamilyEl.addEventListener('change', function () {
         readEl.style.fontFamily = '"' + this.value + '", "Courier New", "Times New Roman"';
     });
 
     fontSizeEl.addEventListener('change', function () {
         readEl.style.fontSize = this.value + 'px';
+        readEl.setAttribute( 'style', 'font-size: ' + this.value + 'px !important' );
     });
 
     fontColorEl.addEventListener('change', function () {
         readEl.style.color = this.value;
+        fontColorPicker.style.backgroundColor = this.value;
     });
 
     backgroundColorEl.addEventListener('change', function () {
         readEl.style.backgroundColor = this.value;
+        backgroundColorPicker.style.backgroundColor = this.value;
     });
 
     hideBtn.addEventListener('click', function () {
@@ -75,7 +88,8 @@ window.addEventListener('load', function () {
             pasteCleanBtn.disabled = true;
             pasteBtn.disabled = true;
             editRawContentBtn.disabled = true;
-
+            cssBtn.disabled = true;
+            saveBtn.disabled = true;
         } else {
             readEl.contentEditable = false;
             readEl.style.border = 'none';
@@ -84,6 +98,8 @@ window.addEventListener('load', function () {
             pasteCleanBtn.disabled = false;
             pasteBtn.disabled = false;
             editRawContentBtn.disabled = false;
+            cssBtn.disabled = false;
+            saveBtn.disabled = false;
         }
     }
 
@@ -103,6 +119,7 @@ window.addEventListener('load', function () {
             pasteBtn.disabled = true;
             saveBtn.disabled = true;
             editContentBtn.disabled = true;
+            cssBtn.disabled = true;
         } else {
             readEl.contentEditable = false;
             readEl.style.border = 'none';
@@ -115,6 +132,7 @@ window.addEventListener('load', function () {
             pasteBtn.disabled = false;
             saveBtn.disabled = false;
             editContentBtn.disabled = false;
+            cssBtn.disabled = false;
         }
     }
 
@@ -135,5 +153,33 @@ window.addEventListener('load', function () {
 
     saveBtn.addEventListener('click', function() {
         localStorage.setItem('read_content', readEl.innerHTML);
+        localStorage.setItem('css_content', cssStylesEl.innerHTML);
+    });
+
+    cssBtn.addEventListener('click', function() {
+        if (cssStylesEditorEl.style.display != 'block') {
+            cssStylesEditorEl.innerText = cssStylesEl.innerHTML;
+            cssStylesEditorEl.style.display = 'block';
+            this.innerHTML = 'Close CSS editor';
+            readEl.style.display = 'none';
+
+            // avoid misuse of editor
+            pasteCleanBtn.disabled = true;
+            pasteBtn.disabled = true;
+            saveBtn.disabled = true;
+            editContentBtn.disabled = true;
+            editRawContentBtn.disabled = true;
+        } else {
+            cssStylesEl.innerHTML = cssStylesEditorEl.innerText;
+            cssStylesEditorEl.style.display = 'none';
+            this.innerHTML = 'Edit CSS';
+            readEl.style.display = 'block';
+            // avoid misuse of editor
+            pasteCleanBtn.disabled = false;
+            pasteBtn.disabled = false;
+            saveBtn.disabled = false;
+            editContentBtn.disabled = false;
+            editRawContentBtn.disabled = false;
+        }
     });
 });

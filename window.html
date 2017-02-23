@@ -3,10 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Nerd Reader</title>
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
     <style>
         .content {
             background-color: gainsboro;
-            font-family: Arial, serif;
+        }
+
+        * {
+            font-family: Roboto, Arial, serif;
+        }
+
+        button, select option, input {
+            padding-top: 3px;
         }
 
         .content form {
@@ -18,11 +26,20 @@
             padding: 10px;
             color: black;
             font-size: 16px;
-            font-family: Verdana, Georgia, Monaco, serif;
+            font-family: Roboto, Verdana, Georgia, Monaco, serif;
         }
 
         body {
             margin: 0;
+        }
+
+        .color_picker {
+            width: 13px;
+            height: 13px;
+            display: inline-block;
+            border: 1px solid black;
+            position: relative;
+            top: 4px;
         }
 
         .form_group {
@@ -37,20 +54,74 @@
         #show_btn {
             margin-left: 10px;
         }
+
+        #font_color_picker {
+            background-color: black;
+        }
+
+        #back_color_picker {
+            background-color: gainsboro;
+        }
+
+        #custom_css_editor {
+            min-height: 100px;
+            border: 1px dotted red;
+            padding: 10px;
+        }
+
+        form.editor_form button:hover, #show_btn:hover {
+            background-color: white;
+            border: 1px solid #4CAF50;
+            color: #4CAF50;
+        }
+
+        form.editor_form button:disabled {
+            background-color: white;
+            border-color: darkgrey;
+            color: darkgrey;
+        }
+
+        form.editor_form button, #show_btn {
+            background-color: #4CAF50;
+            border: 1px solid #4CAF50;
+            color: white;
+            box-shadow: blue;
+            border-radius: 5px;
+            /*padding: 15px 32px;*/
+            padding: 5px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 13px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+
+        .content #hide_btn, .content #show_btn {
+            background-color: goldenrod;
+            border: 1px solid goldenrod;
+        }
+
+        .content #hide_btn:hover, .content #show_btn:hover {
+            background-color: white;
+            border: 1px solid goldenrod;
+        }
     </style>
+    <style type="text/css" id="custom_css"></style>
 </head>
 <body>
 <div class="content">
-    <form action="#">
+    <form class="editor_form" action="#">
         <h2>Window Editor</h2>
         <div class="form_group">
             <label for="f_font_family">Font family</label>
             <select name="font_family" id="f_font_family">
-                <option value="Verdana" selected>Verdana</option>
                 <option value="Georgia">Georgia</option>
-                <option value="Monaco">Monaco</option>
-                <option value="Lucida Grande">Lucida Grande</option>
                 <option value="Helvetica Neue">Helvetica Neue</option>
+                <option value="Lucida Grande">Lucida Grande</option>
+                <option value="Monaco">Monaco</option>
+                <option value="Roboto" selected>Roboto</option>
+                <option value="Verdana">Verdana</option>
             </select>
         </div>
 
@@ -74,6 +145,8 @@
                 <option value="gainsboro">gainsboro</option>
                 <option value="white">white</option>
             </select>
+
+            <div class="color_picker" id="font_color_picker"></div>
         </div>
 
         <div class="form_group">
@@ -89,6 +162,8 @@
                 <option value="gainsboro" selected>gainsboro</option>
                 <option value="white">white</option>
             </select>
+
+            <div class="color_picker" id="back_color_picker"></div>
         </div>
 
         <div class="footer">
@@ -97,10 +172,13 @@
             <button type="button" id="paste_clean_btn">Paste Clean From Clipboard</button>
             <button type="button" id="edit_content_btn">Edit Content</button>
             <button type="button" id="edit_raw_content_btn">Edit Raw Content</button>
+            <button type="button" id="css_btn">Edit CSS</button>
             <button type="button" id="save_btn">Save</button>
         </div>
     </form>
     <button style="display: none;" type="button" id="show_btn">Edit</button>
+
+    <div id="custom_css_editor" style="display: none;"></div>
 
     <article id="read_content">
         <h1>Some text</h1>

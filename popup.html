@@ -15,7 +15,15 @@
             font-size: 16px;
             font-family: Verdana, Georgia, Monaco, serif;
         }
+
+        #custom_css_editor {
+            min-height: 100px;
+            border: 1px dotted red;
+            padding: 10px;
+            margin-top: 10px;
+        }
     </style>
+    <style type="text/css" id="custom_css"></style>
 </head>
 <body>
 <div class="content">
@@ -40,8 +48,12 @@
         <button type="button" id="paste_clean_btn">Paste Clean From Clipboard</button>
         <button type="button" id="edit_content_btn">Edit Content</button>
         <button type="button" id="edit_raw_content_btn">Edit Raw Content</button>
+        <button type="button" id="css_btn">Edit CSS</button>
         <button type="button" id="save_btn">Save</button>
     </form>
+
+    <div id="custom_css_editor" style="display: none;"></div>
+
     <article id="read_content"></article>
 </div>
 <script type="text/javascript" src="popup.js"></script>
