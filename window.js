@@ -6,15 +6,20 @@ window.addEventListener('load', function () {
     var readEl = document.getElementById('read_content');
     var hideBtn = document.getElementById('hide_btn');
     var showBtn = document.getElementById('show_btn');
+    var saveBtn = document.getElementById('save_btn');
     var pasteBtn = document.getElementById('paste_btn');
     var pasteCleanBtn = document.getElementById('paste_clean_btn');
     var editContentBtn = document.getElementById('edit_content_btn');
+    var editRawContentBtn = document.getElementById('edit_raw_content_btn');
 
     readEl.contentEditable = false;
 
     // pass content from popup to window reader
     if (sessionStorage.getItem('read_content')) {
         readEl.innerHTML = sessionStorage.getItem('read_content');
+        sessionStorage.removeItem('read_content'); // clear buffer
+    } else if (localStorage.getItem('read_content')) {
+        readEl.innerHTML = localStorage.getItem('read_content'); // show last saved
     }
 
     fontFamilyEl.addEventListener('change', function () {
@@ -69,16 +74,52 @@ window.addEventListener('load', function () {
             // avoid misuse of editor
             pasteCleanBtn.disabled = true;
             pasteBtn.disabled = true;
+            editRawContentBtn.disabled = true;
+
         } else {
             readEl.contentEditable = false;
             readEl.style.border = 'none';
             editContentBtn.innerHTML = 'Edit Content';
+
             pasteCleanBtn.disabled = false;
             pasteBtn.disabled = false;
+            editRawContentBtn.disabled = false;
+        }
+    }
+
+    function triggerEditRawContent() {
+        var buf;
+
+        if (readEl.contentEditable == 'false') {
+            readEl.contentEditable = true;
+            readEl.style.border = '1px dashed red';
+            editRawContentBtn.innerHTML = 'Stop Editing';
+
+            buf = readEl.innerHTML;
+            readEl.innerText = buf;
+
+            // avoid misuse of editor
+            pasteCleanBtn.disabled = true;
+            pasteBtn.disabled = true;
+            saveBtn.disabled = true;
+            editContentBtn.disabled = true;
+        } else {
+            readEl.contentEditable = false;
+            readEl.style.border = 'none';
+            editRawContentBtn.innerHTML = 'Edit Raw Content';
+
+            buf = readEl.innerText;
+            readEl.innerHTML = buf;
+
+            pasteCleanBtn.disabled = false;
+            pasteBtn.disabled = false;
+            saveBtn.disabled = false;
+            editContentBtn.disabled = false;
         }
     }
 
     editContentBtn.addEventListener('click', triggerEditContent);
+    editRawContentBtn.addEventListener('click', triggerEditRawContent);
 
     document.body.onkeyup = function (ev) {
         if (ev.code == 'Escape') {
@@ -91,4 +132,8 @@ window.addEventListener('load', function () {
             }
         }
     };
+
+    saveBtn.addEventListener('click', function() {
+        localStorage.setItem('read_content', readEl.innerHTML);
+    });
 });
