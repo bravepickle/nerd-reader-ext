@@ -1,6 +1,11 @@
 # nerd-reader-ext
 Chrome extension for reading clean texts within browser
 
+## Overview
+Read texts from internet pages in more convenient way. In some cases sites provide content, such as text, with bad formatting or some restrictions to styling, JavaScript errors, popups etc. which prevents a user to easily read page texts. One can use given extension to format text the way you like, see and focus on reading content you like without distraction. 
+
+If one knows CSS styling, HTML then it is even easier to format content and achieve maximum results with minimum effort
+
 ## Features
 - [x] view selected text in reader mode
 - [x] customize reader

@@ -81,6 +81,7 @@ window.addEventListener('load', function () {
             pasteCleanBtn.disabled = true;
             pasteBtn.disabled = true;
             editContentBtn.disabled = true;
+            saveBtn.disabled = true;
         } else {
             readEl.contentEditable = false;
             readEl.style.border = 'none';
@@ -92,6 +93,7 @@ window.addEventListener('load', function () {
             pasteCleanBtn.disabled = false;
             pasteBtn.disabled = false;
             editContentBtn.disabled = false;
+            saveBtn.disabled = false;
         }
     }
 
