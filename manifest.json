@@ -2,7 +2,7 @@
   "manifest_version": 2,
 
   "name": "Nerd Reader",
-  "description": "This extension provides possibility to view any pasted text in formatted way",
+  "description": "This extension provides possibility to view any pasted text in formatted way. Can be used to display static content of pages (e.g. articles, images, video) without bad formatting, ads etc.",
   "version": "1.0",
   "icons": {
     "128": "icon.png"
