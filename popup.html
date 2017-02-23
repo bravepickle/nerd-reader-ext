@@ -5,9 +5,8 @@
     <title>Nerd Reader</title>
     <style>
         .content {
-            width: 700pt;
-            height: 200pt;
-            color: silver;
+            width: 770px;
+            height: 570px;
         }
     </style>
 </head>
@@ -15,9 +14,23 @@
 <div class="content">
     <h1>Read</h1>
     <form action="#">
-        <label for="f_input">Reader width (pt)</label>
-        <input id="f_input" type="text" value="700" placeholder="Reader width (pt)" required="required" />
+        <p class="form_group">
+            <label for="f_input_width">Reader width (px)</label>
+            <input id="f_input_width" name="width" type="range" value="800" placeholder="Reader width (px)" required
+                   min="100" max="3000"/>
+            <span id="f_output_width">800 px</span>
+        </p>
+
+        <p class="form_group">
+            <label for="f_input_height">Reader height (px)</label>
+            <input id="f_input_height" name="height" type="range" value="600" placeholder="Reader height (px)" required
+                   min="100" max="2000"/>
+            <span id="f_output_height">600 px</span>
+        </p>
+
+        <button type="submit">Open In Window</button>
     </form>
 </div>
+<script type="text/javascript" src="popup.js"></script>
 </body>
 </html>

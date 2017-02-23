@@ -1,16 +1,19 @@
 {
   "manifest_version": 2,
 
-  "name": "Clean articles reader within Chrome browser",
+  "name": "Nerd Reader",
   "description": "This extension provides possibility to view any pasted text in formatted way",
   "version": "1.0",
-
+  "icons": {
+    "128": "icon.png"
+  },
   "browser_action": {
     "default_icon": "icon.png",
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_title": "Nerd Reader"
   },
   "permissions": [
     "activeTab",
-    "https://ajax.googleapis.com/"
+    "clipboardRead"
   ]
 }

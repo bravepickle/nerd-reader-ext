@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Nerd Reader</title>
+    <style>
+        .content {
+            background-color: gainsboro;
+            font-family: Arial, serif;
+        }
+
+        .content form {
+            padding: 10px;
+        }
+
+        .content article {
+            background-color: black;
+            padding: 10px;
+            color: blue;
+            font-size: 16px;
+            font-family: Verdana, Georgia, Monaco, serif;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        .form_group {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .footer {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="content">
+    <form action="#">
+        <h2>Window Editor</h2>
+        <div class="form_group">
+            <label for="f_font_family">Font family</label>
+            <select name="font_family" id="f_font_family">
+                <option value="Verdana" selected>Verdana</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Monaco">Monaco</option>
+                <option value="Lucida Grande">Lucida Grande</option>
+                <option value="Helvetica Neue">Helvetica Neue</option>
+            </select>
+        </div>
+
+        <div class="form_group">
+            <label for="f_font_size">Font size</label>
+            <input id="f_font_size" name="font_size" type="number" value="16" placeholder="Font size (px)" required
+                   min="5" max="60"/>
+        </div>
+
+        <div class="form_group">
+            <label for="f_font_color">Font color</label>
+            <select name="font_color" id="f_font_color">
+                <option value="beige">beige</option>
+                <option value="black">black</option>
+                <option value="blue" selected>blue</option>
+                <option value="chartreuse">chartreuse</option>
+                <option value="cornflowerblue">cornflowerblue</option>
+                <option value="darkgrey">darkgrey</option>
+                <option value="darkslategray">darkslategray</option>
+                <option value="deepskyblue">deepskyblue</option>
+                <option value="gainsboro">gainsboro</option>
+                <option value="white">white</option>
+            </select>
+        </div>
+
+        <div class="form_group">
+            <label for="f_back_color">Font color</label>
+            <select name="back_color" id="f_back_color">
+                <option value="beige">beige</option>
+                <option value="black" selected>black</option>
+                <option value="blue">blue</option>
+                <option value="cornflowerblue">cornflowerblue</option>
+                <option value="darkgrey">darkgrey</option>
+                <option value="darkslategray">darkslategray</option>
+                <option value="deepskyblue">deepskyblue</option>
+                <option value="gainsboro">gainsboro</option>
+                <option value="white">white</option>
+            </select>
+        </div>
+
+        <div class="footer">
+            <button type="button" id="hide_btn">Close</button>
+        </div>
+    </form>
+    <button style="display: none;" type="button" id="show_btn">Edit</button>
+
+    <article id="read_content">
+        <h1>Some text</h1>
+        <p>Some values
+        <p>Lorem ipsum@! 123459809
+    </article>
+</div>
+<script type="text/javascript" src="window.js"></script>
+</body>
+</html>
