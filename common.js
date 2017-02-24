@@ -51,6 +51,7 @@ var serviceObj = new function () {
     };
 }();
 
+// Services registry
 var registry = function () {
     var self = this;
     self.services = [];
@@ -66,8 +67,6 @@ var registry = function () {
             if (typeof self.services[index] == 'function') {
                 // init service
                 self.services[index] = new self.services[index](self);
-            // } else {
-            //     self.services[index].init(self);
             }
         }
     };
@@ -82,7 +81,6 @@ var registry = function () {
         return null;
     };
 };
-
 
 // === ContentSvc - service to handle main reader content
 var contentSvc = function (reg) {
@@ -173,7 +171,7 @@ var contentSvc = function (reg) {
             self.editContentBtn.disabled = false;
             self.enableOtherSvcControls(self.name);
         }
-    }
+    };
 
     this.init(reg);
 };
@@ -247,7 +245,6 @@ var fontSvc = function (reg) {
         self.fontColorPicker = document.getElementById('font_color_picker');
 
         self.bindFormEls();
-
         self.setRegistry(reg);
     };
 
@@ -287,7 +284,6 @@ var backgroundSvc = function (reg) {
         self.backgroundColorPicker = document.getElementById('back_color_picker');
 
         self.bindFormEls();
-
         self.setRegistry(reg);
     };
 
@@ -318,7 +314,6 @@ var storageSvc = function (reg) {
 
         self.initStorage();
         self.bindFormEls();
-
         self.setRegistry(reg);
     };
 
@@ -360,7 +355,6 @@ var storageSvc = function (reg) {
 
 storageSvc.prototype = serviceObj;
 
-
 // === ClipboardSvc - paste content to editor with formatting
 var clipboardSvc = function (reg) {
     var self = this;
@@ -376,7 +370,6 @@ var clipboardSvc = function (reg) {
         self.pasteCleanBtn = document.getElementById('paste_clean_btn');
 
         self.bindFormEls();
-
         self.setRegistry(reg);
     };
 
@@ -481,39 +474,12 @@ var stylesSvc = function (reg) {
                 self.cssStylesEditorEl.focus();
                 this.innerHTML = 'Close CSS editor';
                 self.readEl.style.display = 'none';
-
-                // avoid misuse of editor
-                // pasteCleanBtn.disabled = true;
-                // pasteBtn.disabled = true;
-                // saveBtn.disabled = true;
-                // editContentBtn.disabled = true;
-                // editRawContentBtn.disabled = true;
-
-                // for (var i = 0; self.registry.services.length > i; i++) {
-                //     if (self.registry.services[i].getName() != self.getName()) {
-                //         self.registry.services[i].disableControls();
-                //     }
-                // }
-
                 self.disableOtherSvcControls(self.name);
             } else {
                 self.cssStylesEl.innerHTML = self.cssStylesEditorEl.innerText;
                 self.cssStylesEditorEl.style.display = 'none';
                 this.innerHTML = 'Edit CSS';
                 self.readEl.style.display = 'block';
-                // avoid misuse of editor
-                // self.pasteCleanBtn.disabled = false;
-                // self.pasteBtn.disabled = false;
-                // self.saveBtn.disabled = false;
-                // self.editContentBtn.disabled = false;
-                // self.editRawContentBtn.disabled = false;
-
-                // for (var i = 0; self.registry.services.length > i; i++) {
-                //     if (self.registry.services[i].getName() != self.getName()) {
-                //         self.registry.services[i].enableControls();
-                //     }
-                // }
-
                 self.enableOtherSvcControls(self.name);
             }
         });
@@ -523,3 +489,47 @@ var stylesSvc = function (reg) {
 };
 
 stylesSvc.prototype = serviceObj;
+
+// === WindowSvc - window popup manipulation
+var windowSvc = function (reg) {
+    var self = this;
+    self.name = 'Window';
+    self.readEl = null;
+
+    self.widthEl = null;
+    self.heightEl = null;
+    self.form = null;
+
+    self.init = function (reg) {
+        self.readEl = self.getContentSvc().readEl;
+        self.widthEl = document.getElementById('f_input_width');
+        self.heightEl = document.getElementById('f_input_height');
+        self.form = document.forms[0];
+
+        self.bindFormEls();
+        self.setRegistry(reg);
+    };
+
+    self.bindFormEls = function () {
+        self.widthEl.addEventListener('change', function () {
+            document.getElementById('f_output_width').innerHTML = this.value + ' px';
+            document.getElementsByClassName('content')[0].style.width = this.value - 30 + 'px';
+        });
+
+        self.heightEl.addEventListener('change', function () {
+            document.getElementById('f_output_height').innerHTML = this.value + ' px';
+            document.getElementsByClassName('content')[0].style.height = this.value - 30 + 'px';
+        });
+
+        self.form.addEventListener('submit', function () {
+            sessionStorage.setItem('read_content', self.readEl.innerHTML);
+            window.open('window.html#' + self.widthEl.value + "," + self.heightEl.value, 'Nerd Book', "location=no,width=" + self.widthEl.value + ",height=" + self.heightEl.value + ",scrollbars=yes");
+
+            return false;
+        });
+    };
+
+    this.init(reg);
+};
+
+windowSvc.prototype = serviceObj;
