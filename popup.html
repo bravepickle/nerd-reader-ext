@@ -23,13 +23,40 @@
             padding: 10px;
             margin-top: 10px;
         }
+
+        form.editor_form button:hover {
+            background-color: white;
+            border: 1px solid #4CAF50;
+            color: #4CAF50;
+        }
+
+        form.editor_form button:disabled {
+            background-color: white;
+            border-color: darkgrey;
+            color: darkgrey;
+        }
+
+        form.editor_form button {
+            background-color: #4CAF50;
+            border: 1px solid #4CAF50;
+            color: white;
+            box-shadow: blue;
+            border-radius: 3px;
+            padding: 2px 3px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 11px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
     </style>
     <style type="text/css" id="custom_css"></style>
 </head>
 <body>
 <div class="content">
     <h1>Read Nerdy Snippet</h1>
-    <form action="#">
+    <form action="#" class="editor_form">
         <p class="form_group">
             <label for="f_input_width">Reader width (px)</label>
             <input id="f_input_width" name="width" type="range" value="800" placeholder="Reader width (px)" required
