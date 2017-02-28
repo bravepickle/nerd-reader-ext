@@ -315,6 +315,8 @@ var editorPanelSvc = function (reg) {
 
         self.showBtn.addEventListener('click', function () {
             document.forms[0].style.display = 'block';
+            document.forms[0].focus();
+            window.scrollTo(0, 0);
             this.style.display = 'none';
         });
     };
@@ -350,13 +352,11 @@ var fontSvc = function (reg) {
     self.bindFormEls = function () {
         self.fontFamilyEl.addEventListener('change', function () {
             self.readEl.style.fontFamily = '"' + this.value + '", "Courier New", "Times New Roman"';
-            self.readEl.setAttribute('style', 'font-family: "' + this.value + '", "Courier New", "Times New Roman" !important');
             self.contentSvc.resizeIframe();
         });
 
         self.fontSizeEl.addEventListener('change', function (ev) {
             self.readEl.style.fontSize = ev.target.value + 'px';
-            self.readEl.style.cssText = 'font-size: ' + this.value + 'px !important';
             self.contentSvc.resizeIframe();
         });
 
