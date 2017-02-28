@@ -17,6 +17,8 @@ If one knows CSS styling, HTML then it is even easier to format content and achi
 - [x] edit/show raw content
 - [x] save text for later reading (for now, to localStorage only)
 - [x] customise CSS file
+- [x] clear inline styles from text
+- [ ] move screenshots from Monosnap to somewhere else with
 
 
 ## Examples

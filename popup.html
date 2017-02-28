@@ -25,9 +25,8 @@
         }
 
         form.editor_form button:hover {
-            background-color: white;
-            border: 1px solid #4CAF50;
-            color: #4CAF50;
+            background-color: #5CBF60;
+            border: 1px solid #5CBF60;
         }
 
         form.editor_form button:disabled {
@@ -59,24 +58,25 @@
     <form action="#" class="editor_form">
         <p class="form_group">
             <label for="f_input_width">Reader width (px)</label>
-            <input id="f_input_width" name="width" type="range" value="800" placeholder="Reader width (px)" required
+            <input id="f_input_width" name="width" type="range" step="50" value="800" placeholder="Reader width (px)" required
                    min="100" max="3000"/>
             <span id="f_output_width">800 px</span>
         </p>
 
         <p class="form_group">
             <label for="f_input_height">Reader height (px)</label>
-            <input id="f_input_height" name="height" type="range" value="600" placeholder="Reader height (px)" required
+            <input id="f_input_height" name="height" type="range" step="50" value="600" placeholder="Reader height (px)" required
                    min="100" max="2000"/>
             <span id="f_output_height">600 px</span>
         </p>
 
         <button type="submit">Open In Window</button>
-        <button type="button" id="paste_btn">Paste From Clipboard</button>
-        <button type="button" id="paste_clean_btn">Paste Clean From Clipboard</button>
+        <button type="button" id="paste_btn">Paste</button>
+        <button type="button" id="paste_clean_btn">Paste Plain Text</button>
         <button type="button" id="edit_content_btn">Edit Content</button>
         <button type="button" id="edit_raw_content_btn">Edit Raw Content</button>
         <button type="button" id="css_btn">Edit CSS</button>
+        <button type="button" id="clear_styles_btn">Clear Inline Styles</button>
         <button type="button" id="save_btn">Save</button>
     </form>
 

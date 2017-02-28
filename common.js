@@ -88,17 +88,28 @@ var contentSvc = function (reg) {
     self.name = 'Content';
     self.readEl = null;
     self.editContentBtn = null;
+    self.clearStylesBtn = null;
     self.editRawContentBtn = null;
+    self.iframeEl = null;
 
     self.init = function (reg) {
         self.readEl = document.getElementById('read_content');
+
+        if (!self.readEl) { // try searching iframe doc otherwise
+            self.iframeEl = document.getElementById('read_window');
+            self.readEl = self.iframeEl.contentDocument.getElementById('read_content');
+            if (!self.readEl) {
+                console.warn('Read content HTML element not found');
+            }
+        }
+
         self.editContentBtn = document.getElementById('edit_content_btn');
         self.editRawContentBtn = document.getElementById('edit_raw_content_btn');
+        self.clearStylesBtn = document.getElementById('clear_styles_btn');
 
         self.readEl.contentEditable = false;
 
         self.bindFormEls();
-
         self.setRegistry(reg);
     };
 
@@ -110,6 +121,10 @@ var contentSvc = function (reg) {
         if (self.editRawContentBtn) {
             self.editRawContentBtn.disabled = true;
         }
+
+        if (self.clearStylesBtn) {
+            self.clearStylesBtn.disabled = true;
+        }
     };
 
     self.enableControls = function () {
@@ -120,11 +135,34 @@ var contentSvc = function (reg) {
         if (self.editRawContentBtn) {
             self.editRawContentBtn.disabled = false;
         }
+
+        if (self.clearStylesBtn) {
+            self.clearStylesBtn.disabled = false;
+        }
     };
 
     self.bindFormEls = function () {
         self.editContentBtn.addEventListener('click', self.triggerEditContent);
         self.editRawContentBtn.addEventListener('click', self.triggerEditRawContent);
+        self.clearStylesBtn.addEventListener('click', self.clearInlineStyles);
+
+        if (self.iframeEl) {
+            self.iframeEl.addEventListener('load', function () {
+                self.resizeIframe();
+            });
+
+            self.readEl.addEventListener('change', function () {
+                self.resizeIframe();
+            });
+        }
+    };
+
+    self.resizeIframe = function () {
+        if (!self.iframeEl) {
+            return;
+        }
+
+        self.iframeEl.style.height = self.iframeEl.contentWindow.document.body.scrollHeight + 'px';
     };
 
     self.triggerEditContent = function () {
@@ -135,6 +173,7 @@ var contentSvc = function (reg) {
             self.editContentBtn.innerHTML = 'Stop Editing';
 
             self.editRawContentBtn.disabled = true;
+            self.clearStylesBtn.disabled = true;
             self.disableOtherSvcControls(self.name);
         } else {
             self.readEl.contentEditable = false;
@@ -142,6 +181,7 @@ var contentSvc = function (reg) {
             self.editContentBtn.innerHTML = 'Edit Content';
 
             self.editRawContentBtn.disabled = false;
+            self.clearStylesBtn.disabled = false;
             self.enableOtherSvcControls(self.name);
         }
     };
@@ -159,6 +199,7 @@ var contentSvc = function (reg) {
             self.readEl.innerText = buf;
 
             self.editContentBtn.disabled = true;
+            self.clearStylesBtn.disabled = true;
             self.disableOtherSvcControls(self.name);
         } else {
             self.readEl.contentEditable = false;
@@ -169,7 +210,63 @@ var contentSvc = function (reg) {
             self.readEl.innerHTML = buf;
 
             self.editContentBtn.disabled = false;
+            self.clearStylesBtn.disabled = false;
             self.enableOtherSvcControls(self.name);
+        }
+    };
+
+    self.clearInlineStyles = function () {
+        var all = self.readEl.getElementsByTagName('*');
+        var i = all.length;
+        var j, is_hidden;
+
+        // Presentational attributes.
+        var attr = [
+            'align',
+            'background',
+            'bgcolor',
+            'border',
+            'cellpadding',
+            'cellspacing',
+            'color',
+            'face',
+            'height',
+            'hspace',
+            'marginheight',
+            'marginwidth',
+            'noshade',
+            'nowrap',
+            'valign',
+            'vspace',
+            'width',
+            'vlink',
+            'alink',
+            'text',
+            'link',
+            'frame',
+            'frameborder',
+            'clear',
+            'scrolling',
+            'style'
+        ];
+
+        var attr_len = attr.length;
+
+        while (i--) {
+            is_hidden = (all[i].style.display === 'none');
+
+            j = attr_len;
+
+            while (j--) {
+                all[i].removeAttribute(attr[j]);
+            }
+
+            // Re-hide display:none elements,
+            // so they can be toggled via JS.
+            if (is_hidden) {
+                all[i].style.display = 'none';
+                is_hidden = false;
+            }
         }
     };
 
@@ -236,12 +333,14 @@ var fontSvc = function (reg) {
     self.fontColorEl = null;
     self.readEl = null;
     self.fontColorPicker = null;
+    self.contentSvc = null;
 
     self.init = function (reg) {
         self.fontFamilyEl = document.getElementById('f_font_family');
         self.fontSizeEl = document.getElementById('f_font_size');
         self.fontColorEl = document.getElementById('f_font_color');
-        self.readEl = self.getContentSvc().readEl;
+        self.contentSvc = self.getContentSvc();
+        self.readEl = self.contentSvc.readEl;
         self.fontColorPicker = document.getElementById('font_color_picker');
 
         self.bindFormEls();
@@ -252,16 +351,19 @@ var fontSvc = function (reg) {
         self.fontFamilyEl.addEventListener('change', function () {
             self.readEl.style.fontFamily = '"' + this.value + '", "Courier New", "Times New Roman"';
             self.readEl.setAttribute('style', 'font-family: "' + this.value + '", "Courier New", "Times New Roman" !important');
+            self.contentSvc.resizeIframe();
         });
 
         self.fontSizeEl.addEventListener('change', function (ev) {
             self.readEl.style.fontSize = ev.target.value + 'px';
             self.readEl.style.cssText = 'font-size: ' + this.value + 'px !important';
+            self.contentSvc.resizeIframe();
         });
 
         self.fontColorEl.addEventListener('change', function () {
             self.readEl.style.color = this.value;
             self.fontColorPicker.style.backgroundColor = this.value;
+            self.contentSvc.resizeIframe();
         });
     };
 
@@ -306,11 +408,19 @@ var storageSvc = function (reg) {
     self.saveBtn = null;
     self.readEl = null;
     self.cssStylesEl = null;
+    self.contentSvc = null;
 
     self.init = function (reg) {
         self.saveBtn = document.getElementById('save_btn');
-        self.readEl = self.getContentSvc().readEl;
+        self.contentSvc = self.getContentSvc();
+        self.readEl = self.contentSvc.readEl;
         self.cssStylesEl = document.getElementById('custom_css');
+        if (!self.cssStylesEl) { // try searching iframe doc otherwise
+            self.cssStylesEl = self.contentSvc.iframeEl.contentDocument.getElementById('custom_css');
+            if (!self.cssStylesEl) {
+                console.warn('Custom CSS element not found');
+            }
+        }
 
         self.initStorage();
         self.bindFormEls();
@@ -330,16 +440,24 @@ var storageSvc = function (reg) {
     };
 
     self.initStorage = function () {
+        var resize = false;
         // pass content from popup to window reader
         if (sessionStorage.getItem('read_content')) {
             self.readEl.innerHTML = sessionStorage.getItem('read_content');
             sessionStorage.removeItem('read_content'); // clear buffer
+            resize = true;
         } else if (localStorage.getItem('read_content')) {
             self.readEl.innerHTML = localStorage.getItem('read_content'); // show last saved
+            resize = true;
         }
 
         if (localStorage.getItem('css_content')) {
             self.cssStylesEl.innerHTML = localStorage.getItem('css_content');
+            resize = true;
+        }
+
+        if (resize) {
+            self.contentSvc.resizeIframe();
         }
     };
 
@@ -365,7 +483,8 @@ var clipboardSvc = function (reg) {
     self.contentSvc = null;
 
     self.init = function (reg) {
-        self.readEl = self.getContentSvc().readEl;
+        self.contentSvc = self.getContentSvc();
+        self.readEl = self.contentSvc.readEl;
         self.pasteBtn = document.getElementById('paste_btn');
         self.pasteCleanBtn = document.getElementById('paste_clean_btn');
 
@@ -394,35 +513,41 @@ var clipboardSvc = function (reg) {
     };
 
     self.triggerEditContent = function () {
-        var contentSvc = self.getContentSvc();
-
-        if (contentSvc.readEl.contentEditable == 'false') {
-            contentSvc.readEl.contentEditable = true;
-            contentSvc.editRawContentBtn.disabled = true;
+        if (self.contentSvc.readEl.contentEditable == 'false') {
+            self.contentSvc.readEl.contentEditable = true;
+            self.contentSvc.editRawContentBtn.disabled = true;
         } else {
-            contentSvc.readEl.contentEditable = false;
-            contentSvc.editRawContentBtn.disabled = false;
+            self.contentSvc.readEl.contentEditable = false;
+            self.contentSvc.editRawContentBtn.disabled = false;
         }
     };
 
     self.bindFormEls = function () {
         self.pasteBtn.addEventListener('click', function () {
-
-
             self.triggerEditContent();
             self.readEl.focus();
             self.readEl.innerHTML = '';
-            document.execCommand('paste');
+            if (self.contentSvc.iframeEl) {
+                self.contentSvc.iframeEl.contentDocument.execCommand('paste');
+            } else {
+                document.execCommand('paste');
+            }
             self.triggerEditContent();
+            self.contentSvc.resizeIframe();
         });
 
         self.pasteCleanBtn.addEventListener('click', function () {
             self.triggerEditContent();
             self.readEl.focus();
             self.readEl.innerHTML = '';
-            document.execCommand('paste');
+            if (self.contentSvc.iframeEl) {
+                self.contentSvc.iframeEl.contentDocument.execCommand('paste');
+            } else {
+                document.execCommand('paste');
+            }
             self.readEl.innerHTML = self.readEl.innerText;
             self.triggerEditContent();
+            self.contentSvc.resizeIframe();
         });
     };
 
@@ -445,8 +570,15 @@ var stylesSvc = function (reg) {
     self.init = function (reg) {
         self.readEl = self.getContentSvc().readEl;
         self.cssBtn = document.getElementById('css_btn');
-        self.cssStylesEl = document.getElementById('custom_css');
         self.cssStylesEditorEl = document.getElementById('custom_css_editor');
+        self.cssStylesEl = document.getElementById('custom_css');
+        if (!self.cssStylesEl) { // try searching iframe doc otherwise
+            var contentSvc = this.getContentSvc();
+            self.cssStylesEl = contentSvc.iframeEl.contentDocument.getElementById('custom_css');
+            if (!self.cssStylesEl) {
+                console.warn('Custom CSS element not found');
+            }
+        }
 
         self.cssStylesEditorEl.contentEditable = true;
 
@@ -472,7 +604,7 @@ var stylesSvc = function (reg) {
                 self.cssStylesEditorEl.innerText = self.cssStylesEl.innerHTML;
                 self.cssStylesEditorEl.style.display = 'block';
                 self.cssStylesEditorEl.focus();
-                this.innerHTML = 'Close CSS editor';
+                this.innerHTML = 'Stop Editing';
                 self.readEl.style.display = 'none';
                 self.disableOtherSvcControls(self.name);
             } else {
@@ -511,12 +643,12 @@ var windowSvc = function (reg) {
     };
 
     self.bindFormEls = function () {
-        self.widthEl.addEventListener('change', function () {
+        self.widthEl.addEventListener('input', function () {
             document.getElementById('f_output_width').innerHTML = this.value + ' px';
             document.getElementsByClassName('content')[0].style.width = this.value - 30 + 'px';
         });
 
-        self.heightEl.addEventListener('change', function () {
+        self.heightEl.addEventListener('input', function () {
             document.getElementById('f_output_height').innerHTML = this.value + ' px';
             document.getElementsByClassName('content')[0].style.height = this.value - 30 + 'px';
         });
