@@ -7,14 +7,20 @@ var serviceObj = new function () {
 
     self.getContentSvc = function () {
         if (!self.contentSvc) {
-            self.contentSvc = self.registry.get('Content');
-            if (!self.contentSvc || typeof self.contentSvc != 'object') {
-                console.warn('Content service is not initialized');
-                return null;
-            }
+            self.contentSvc = self.findService('Content');
         }
 
         return self.contentSvc;
+    };
+
+    self.findService = function (name) {
+        var svc = self.registry.get(name);
+        if (!svc || typeof svc != 'object') {
+            console.warn('Service is not initialized: ' + name);
+            return null;
+        }
+
+        return svc
     };
 
     self.init = function (reg) {
@@ -329,7 +335,7 @@ editorPanelSvc.prototype = serviceObj;
 // === FontSvc - change font settings
 var fontSvc = function (reg) {
     var self = this;
-    self.name = 'Font Size Editor';
+    self.name = 'Font';
     self.fontFamilyEl = null;
     self.fontSizeEl = null;
     self.fontColorEl = null;
@@ -375,7 +381,7 @@ fontSvc.prototype = serviceObj;
 // === BackgroundSvc - change background
 var backgroundSvc = function (reg) {
     var self = this;
-    self.name = 'Background Editor';
+    self.name = 'Background';
     self.backgroundColorEl = null;
     self.readEl = null;
     self.backgroundColorPicker = null;
@@ -404,17 +410,23 @@ backgroundSvc.prototype = serviceObj;
 // === StorageSvc - save content to storage
 var storageSvc = function (reg) {
     var self = this;
-    self.name = 'Content Storage';
+    self.name = 'Storage';
     self.saveBtn = null;
     self.readEl = null;
     self.cssStylesEl = null;
     self.contentSvc = null;
+    self.fontSvc = null;
+    self.backgroundSvc = null;
 
     self.init = function (reg) {
-        self.saveBtn = document.getElementById('save_btn');
         self.contentSvc = self.getContentSvc();
+        self.fontSvc = self.findService('Font');
+        self.backgroundSvc = self.findService('Background');
+
+        self.saveBtn = document.getElementById('save_btn');
         self.readEl = self.contentSvc.readEl;
         self.cssStylesEl = document.getElementById('custom_css');
+
         if (!self.cssStylesEl) { // try searching iframe doc otherwise
             self.cssStylesEl = self.contentSvc.iframeEl.contentDocument.getElementById('custom_css');
             if (!self.cssStylesEl) {
@@ -456,8 +468,51 @@ var storageSvc = function (reg) {
             resize = true;
         }
 
+        if (sessionStorage.getItem('presets')) {
+            self.setPresets(JSON.parse(sessionStorage.getItem('presets')));
+        } else if (localStorage.getItem('presets')) {
+            self.setPresets(JSON.parse(localStorage.getItem('presets')));
+        }
+
         if (resize) {
             self.contentSvc.resizeIframe();
+        }
+    };
+
+    self.getPresets = function () {
+        var data = {};
+        if (self.fontSvc) {
+            data.fontSize = self.fontSvc.fontSizeEl.value;
+            data.fontColor = self.fontSvc.fontColorEl.value;
+            data.fontFamily = self.fontSvc.fontFamilyEl.value;
+        }
+
+        if (self.backgroundSvc) {
+            data.backgroundColor = self.backgroundSvc.backgroundColorEl.value;
+        }
+
+        return data;
+    };
+
+    self.setPresets = function (data) {
+        var ev;
+        if (self.fontSvc) {
+            ev = new Event('change');
+
+            self.fontSvc.fontSizeEl.value = data.fontSize;
+            self.fontSvc.fontSizeEl.dispatchEvent(ev);
+
+            self.fontSvc.fontColorEl.value = data.fontColor;
+            self.fontSvc.fontColorEl.dispatchEvent(ev);
+
+            self.fontSvc.fontFamilyEl.value = data.fontFamily;
+            self.fontSvc.fontFamilyEl.dispatchEvent(ev);
+        }
+
+        if (self.backgroundSvc) {
+            ev = new Event('change');
+            self.backgroundSvc.backgroundColorEl.value = data.backgroundColor;
+            self.backgroundSvc.backgroundColorEl.dispatchEvent(ev);
         }
     };
 
@@ -465,6 +520,7 @@ var storageSvc = function (reg) {
         self.saveBtn.addEventListener('click', function () {
             localStorage.setItem('read_content', self.readEl.innerHTML);
             localStorage.setItem('css_content', self.cssStylesEl.innerHTML);
+            localStorage.setItem('presets', JSON.stringify(self.getPresets()));
         });
     };
 

@@ -11,9 +11,8 @@ If one knows CSS styling, HTML then it is even easier to format content and achi
 - [x] customize reader
 - [ ] select html block to load content from 
 - [x] show/hide window editor
-- [ ] save window editor presets
+- [x] save window editor presets
 - [x] use "escape" key to hide/show window editor
-- [ ] styles force rewrites, strip unnecessary content
 - [x] edit/show raw content
 - [x] save text for later reading (for now, to localStorage only)
 - [x] customise CSS file
