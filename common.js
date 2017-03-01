@@ -392,10 +392,12 @@ var backgroundSvc = function (reg) {
     self.backgroundColorEl = null;
     self.readEl = null;
     self.backgroundColorPicker = null;
+    self.contentSvc = null;
 
     self.init = function (reg) {
         self.backgroundColorEl = document.getElementById('f_back_color');
-        self.readEl = self.getContentSvc().readEl;
+        self.contentSvc = self.getContentSvc();
+        self.readEl = self.contentSvc.readEl;
         self.backgroundColorPicker = document.getElementById('back_color_picker');
 
         self.bindFormEls();
@@ -405,6 +407,9 @@ var backgroundSvc = function (reg) {
     self.bindFormEls = function () {
         self.backgroundColorEl.addEventListener('change', function () {
             self.readEl.style.backgroundColor = this.value;
+            if (self.contentSvc.iframeEl) {
+                self.contentSvc.iframeEl.contentDocument.body.style.backgroundColor = this.value;
+            }
             self.backgroundColorPicker.style.backgroundColor = this.value;
         });
     };
