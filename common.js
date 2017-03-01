@@ -287,10 +287,12 @@ var editorPanelSvc = function (reg) {
     self.name = 'Editor Trigger';
     self.hideBtn = null;
     self.showBtn = null;
+    self.contentSvc = null;
 
     self.init = function (reg) {
         self.hideBtn = document.getElementById('hide_btn');
         self.showBtn = document.getElementById('show_btn');
+        self.contentSvc = this.getContentSvc();
 
         self.bindFormEls();
         self.bindHotKeys();
@@ -299,8 +301,7 @@ var editorPanelSvc = function (reg) {
     };
 
     self.bindHotKeys = function () {
-        // bindKeys
-        document.body.onkeyup = function (ev) {
+        var triggerForm = function (ev) {
             if (ev.code == 'Escape') {
                 var neo = new Event('click');
 
@@ -311,6 +312,12 @@ var editorPanelSvc = function (reg) {
                 }
             }
         };
+
+        // bindKeys
+        document.body.onkeyup = triggerForm;
+        if (self.contentSvc.iframeEl) {
+            self.contentSvc.iframeEl.contentDocument.body.onkeyup = triggerForm;
+        }
     };
 
     self.bindFormEls = function () {
@@ -663,12 +670,16 @@ var stylesSvc = function (reg) {
                 this.innerHTML = 'Stop Editing';
                 self.readEl.style.display = 'none';
                 self.disableOtherSvcControls(self.name);
+
+                console.log(self.cssStylesEl.innerHTML);
             } else {
                 self.cssStylesEl.innerHTML = self.cssStylesEditorEl.innerText;
                 self.cssStylesEditorEl.style.display = 'none';
                 this.innerHTML = 'Edit CSS';
                 self.readEl.style.display = 'block';
                 self.enableOtherSvcControls(self.name);
+
+                console.log(self.cssStylesEditorEl.innerText);
             }
         });
     };
