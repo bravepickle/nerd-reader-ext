@@ -717,11 +717,17 @@ var windowSvc = function (reg) {
     self.bindFormEls = function () {
         self.widthEl.addEventListener('input', function () {
             document.getElementById('f_output_width').innerHTML = this.value + ' px';
+        });
+
+        self.widthEl.addEventListener('change', function () {
             document.getElementsByClassName('content')[0].style.width = this.value - 30 + 'px';
         });
 
         self.heightEl.addEventListener('input', function () {
             document.getElementById('f_output_height').innerHTML = this.value + ' px';
+        });
+
+        self.heightEl.addEventListener('change', function () {
             document.getElementsByClassName('content')[0].style.height = this.value - 30 + 'px';
         });
 
