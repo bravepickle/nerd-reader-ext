@@ -116,6 +116,15 @@
             padding: 0;
         }
 
+        #flash_msg {
+            transition: opacity 0.5s linear;
+            /*transition: visibility 0s, opacity 1s linear;*/
+            /*-moz-transition: visibility 0s, opacity 1s linear;*/
+            /*-webkit-transition: visibility 0s, opacity 1s linear;*/
+            color: #5CBF60;
+            font-size: larger;
+        }
+
     </style>
 </head>
 <body>
@@ -184,7 +193,10 @@
             <button type="button" id="edit_raw_content_btn">Edit Raw Content</button>
             <button type="button" id="css_btn">Edit CSS</button>
             <button type="button" id="clear_styles_btn">Clear Inline Styles</button>
+            <button type="button" id="picker_btn">HTML Picker</button>
             <button type="button" id="save_btn">Save</button>
+            <span id="flash_msg" style="visibility: hidden;"></span>
+            <div id="picker_breadcrumbs"></div>
         </div>
     </form>
     <button style="display: none;" type="button" id="show_btn">Edit</button>

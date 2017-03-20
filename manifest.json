@@ -13,6 +13,9 @@
   },
   "permissions": [
     "activeTab",
-    "clipboardRead"
+    "clipboardRead",
+    "clipboardWrite",
+    "http://*/",
+    "https://*/"
   ]
 }

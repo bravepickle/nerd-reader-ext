@@ -150,7 +150,10 @@ var contentSvc = function (reg) {
     self.bindFormEls = function () {
         self.editContentBtn.addEventListener('click', self.triggerEditContent);
         self.editRawContentBtn.addEventListener('click', self.triggerEditRawContent);
-        self.clearStylesBtn.addEventListener('click', self.clearInlineStyles);
+        self.clearStylesBtn.addEventListener('click', function () {
+            self.clearInlineStyles();
+            self.contentSvc.resizeIframe();
+        });
 
         if (self.iframeEl) {
             self.iframeEl.addEventListener('load', function () {
@@ -190,6 +193,8 @@ var contentSvc = function (reg) {
             self.clearStylesBtn.disabled = false;
             self.enableOtherSvcControls(self.name);
         }
+
+        self.resizeIframe();
     };
 
     self.triggerEditRawContent = function () {
@@ -219,6 +224,8 @@ var contentSvc = function (reg) {
             self.clearStylesBtn.disabled = false;
             self.enableOtherSvcControls(self.name);
         }
+
+        self.resizeIframe();
     };
 
     self.clearInlineStyles = function () {
@@ -273,6 +280,12 @@ var contentSvc = function (reg) {
                 all[i].style.display = 'none';
                 is_hidden = false;
             }
+        }
+
+        var styles = self.readEl.getElementsByTagName('style');
+        for (i = 0; i < styles.length; i++) {
+            var el = styles[i];
+            el.parentNode.removeChild(el);
         }
     };
 
@@ -602,6 +615,7 @@ var clipboardSvc = function (reg) {
             }
             self.triggerEditContent();
             self.contentSvc.resizeIframe();
+            window.scrollTo(0, 0);
         });
 
         self.pasteCleanBtn.addEventListener('click', function () {
@@ -616,6 +630,7 @@ var clipboardSvc = function (reg) {
             self.readEl.innerHTML = self.readEl.innerText;
             self.triggerEditContent();
             self.contentSvc.resizeIframe();
+            window.scrollTo(0, 0);
         });
     };
 
@@ -743,3 +758,289 @@ var windowSvc = function (reg) {
 };
 
 windowSvc.prototype = serviceObj;
+
+
+// === PickerSvc - HTML Picker
+var pickerSvc = function (reg) {
+    var self = this;
+    self.name = 'Picker';
+    self.readEl = null;
+    self.contentSvc = null;
+    self.pickerBtn = null;
+    self.enabled = false;
+    self.pickerElsChain = []; // list of elements that are chained now
+    self.selectedEl = null;   // latest selected el
+    self.breadcrumbsEl = null;
+    self.flashMsgEl = null;
+    self.animationOn = false;
+
+    self.init = function (reg) {
+        self.contentSvc = self.getContentSvc();
+        self.readEl = self.contentSvc.readEl;
+        self.pickerBtn = document.getElementById('picker_btn');
+        self.breadcrumbsEl = document.getElementById('picker_breadcrumbs');
+        self.flashMsgEl = document.getElementById('flash_msg');
+
+        self.bindFormEls();
+        self.setRegistry(reg);
+    };
+
+    self.bindFormEls = function () {
+        self.pickerBtn.addEventListener('click', function () {
+            if (!self.enabled) {
+                this.innerText = 'Cancel';
+                self.enabled = true;
+                self.disableOtherSvcControls(self.name);
+
+                if (self.contentSvc.iframeEl) { // if iframe, then content may change by walking through link
+                    if (!self.readEl) {
+                        self.readEl = self.contentSvc.iframeEl.contentDocument.body;
+                    }
+                }
+
+                if (!self.contentSvc.iframeEl) {
+                    self.readEl.style.cursor = 'crosshair';
+                } else {
+                    self.contentSvc.iframeEl.contentDocument.body.style.cursor = 'crosshair';
+                }
+
+                self.bindPickerHover();
+            } else {
+                this.innerText = 'HTML Picker';
+                self.enabled = false;
+                self.enableOtherSvcControls(self.name);
+
+                if (!self.contentSvc.iframeEl) {
+                    self.readEl.style.cursor = null;
+                } else {
+                    self.contentSvc.iframeEl.contentDocument.body.style.cursor = null;
+                }
+
+                self.unBindPickerHover();
+            }
+        });
+    };
+
+    self.pushChain = function (el) {
+        var found = false;
+        for (var i = 0; i < self.pickerElsChain.length; i++) {
+            if (self.pickerElsChain[i] == el) {
+                found = true;
+            }
+        }
+
+        if (!found) {
+            self.pickerElsChain.push(el);
+
+            return true;
+        }
+
+        return false;
+    };
+
+    self.popChain = function (el) {
+        for (var i = 0; i < self.pickerElsChain.length; i++) {
+            if (self.pickerElsChain[i] == el) {
+                self.pickerElsChain.splice(i, 1);
+
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    self.pickerHoverEl = function (el) {
+        if (self.pushChain(el)) { // if added new
+            // backing up
+            el.dataset.styleBorder = el.style.border;
+            el.dataset.styleTransition = el.style.transition;
+        }
+
+        // changing
+        el.style.border = '1px solid red';
+        el.style.transition = 'border-color 2s';
+    };
+
+    self.pickerHoutEl = function (el) {
+        if (self.popChain(el)) { // found in chain
+            // restore initial
+            el.style.border = el.dataset.styleBorder;
+            el.style.transition = el.dataset.styleTransition;
+        }
+    };
+
+    self.selectText = function (element) {
+        var doc, range, selection;
+        if (!self.contentSvc.iframeEl) {
+            doc = document;
+        } else {
+            doc = self.contentSvc.iframeEl.contentDocument;
+        }
+
+        if (doc.body.createTextRange) {
+            range = doc.body.createTextRange();
+            range.moveToElementText(element);
+            range.select();
+        } else if (window.getSelection) {
+            selection = window.getSelection();
+            range = doc.createRange();
+            range.selectNodeContents(element);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+
+        doc.execCommand('copy');
+    };
+
+    self.bindPickerHover = function () {
+        var all;
+        if (!self.contentSvc.iframeEl) {
+            all = self.readEl.getElementsByTagName('*');
+        } else {
+            all = self.contentSvc.iframeEl.contentDocument.body.getElementsByTagName('*');
+        }
+
+        for (var i = 0; i < all.length; i++) {
+            all[i].addEventListener('mouseover', function (ev) {
+                ev.stopPropagation();
+
+                self.pickerHoverEl(this);
+
+                var topEl = self.getTopElement();
+                var parent = this.parentNode;
+                while (parent != null && parent != topEl) {
+                    self.pickerHoverEl(parent);
+                    parent = parent.parentNode;
+                }
+
+                self.pickEl(this);
+            });
+
+            all[i].addEventListener('click', function (ev) {
+                ev.stopPropagation();
+
+                self.pickEl(this);
+                self.selectText(this);
+
+                if (self.animationOn) {
+                    return; // previous animation is not finished yet
+                }
+
+                self.flashMsgEl.style.opacity = '1';
+                self.flashMsgEl.style.visibility = 'visible';
+                self.flashMsgEl.innerText = 'Selected';
+
+                setTimeout(function () {
+                    self.flashMsgEl.style.opacity = '0';
+
+                    setTimeout(function () {
+                        self.flashMsgEl.innerText = '';
+                        self.flashMsgEl.style.visibility = 'hidden';
+                        self.animationOn = false;
+                    }, 1000);
+                }, 1000);
+
+                self.animationOn = true;
+            });
+
+            all[i].addEventListener('mouseout', function (ev) {
+                ev.stopPropagation();
+
+                self.pickerHoutEl(this);
+
+                var topEl = self.getTopElement();
+                var parent = this.parentNode;
+                while (parent != null && parent != topEl) {
+                    self.pickerHoutEl(parent);
+                    parent = parent.parentNode;
+                }
+
+                if (self.pickerElsChain.length == 0) {
+                    self.pickEl(null); // none is selected
+                }
+            });
+        }
+    };
+
+    self.getTopElement = function () {
+        var topEl;
+        if (!self.contentSvc.iframeEl) {
+            topEl = self.readEl;
+        } else {
+            topEl = self.contentSvc.iframeEl.contentDocument.body;
+        }
+
+        return topEl;
+    };
+
+    self.hasChain = function (el) {
+        for (var i = 0; i < self.pickerElsChain.length; i++) {
+            if (self.pickerElsChain[i] == el) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    self.pickEl = function (el) {
+        self.selectedEl = el;
+
+        if (!el) {
+            self.breadcrumbsEl.innerText = '';
+        } else {
+            var crumbs = [];
+            crumbs.push(self.getElementLabel(el));
+            var topEl = self.getTopElement();
+
+            var parent = el.parentNode;
+            while (parent != null && parent != topEl) {
+                if (self.hasChain(parent)) {
+                    crumbs.push(self.getElementLabel(parent));
+                }
+
+                parent = parent.parentNode;
+            }
+
+            crumbs.reverse();
+
+            self.breadcrumbsEl.innerText = crumbs.join(' > ');
+        }
+    };
+
+    self.getElementLabel = function (el) {
+        var label = el.tagName;
+        if (el.id) {
+            label += '#' + el.id;
+        } else if (el.className) {
+            label += '.' + el.className;
+        }
+
+        return label;
+    };
+
+    self.unBindPickerHover = function () {
+        for (var i = 0; i < self.pickerElsChain.length; i++) {
+            self.pickerElsChain[i].style.cursor = null;
+        }
+
+        self.pickerElsChain = [];
+    };
+
+    self.disableControls = function () {
+        if (self.pickerBtn) {
+            self.pickerBtn.disabled = true;
+        }
+    };
+
+    self.enableControls = function () {
+        if (self.pickerBtn) {
+            self.pickerBtn.disabled = false;
+        }
+    };
+
+    this.init(reg);
+};
+
+pickerSvc.prototype = serviceObj;
