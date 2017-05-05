@@ -125,6 +125,26 @@
             font-size: larger;
         }
 
+        #regex_search_and_replace {
+            /*display: none;*/
+            visibility: hidden;
+            height: 0;
+        }
+
+        #regex_search_and_replace .title {
+            padding-top: 10px;
+            font-weight: bolder;
+        }
+
+        #regex_search_and_replace span {
+            disply: inline-block;
+            margin-right: 10px;
+        }
+
+        #regex_search_and_replace input[type=text] {
+            width: 200px;
+        }
+
     </style>
 </head>
 <body>
@@ -197,6 +217,13 @@
             <button type="button" id="save_btn">Save</button>
             <span id="flash_msg" style="visibility: hidden;"></span>
             <div id="picker_breadcrumbs"></div>
+            <div id="regex_search_and_replace">
+                <div class="title">RegExp search and replace</div>
+                <span><label>Search pattern <input type="text" id="regex_pattern" placeholder="style=&quot;/font-size: (10px);&quot;/ig" title="For regular text replace not start with &quot;/&quot;. For RegExp: /_pattern_/_flags_"></label></span>
+                <span><label>Replace pattern <input type="text" id="regex_replace" placeholder="style=&quot;font: $1 sans-serif;&quot;"></label></span>
+                <!-- <span><button type="button" id="regex_highlight_btn">Highlight</button></span> -->
+                <span><button type="button" id="regex_replace_btn">Replace</button></span>
+            </div>
         </div>
     </form>
     <button style="display: none;" type="button" id="show_btn">Edit</button>

@@ -97,7 +97,9 @@ var contentSvc = function (reg) {
     self.clearStylesBtn = null;
     self.editRawContentBtn = null;
     self.iframeEl = null;
-
+    self.regexBlockEl = null;
+    self.regexReplaceBtn = null;
+    
     self.init = function (reg) {
         self.readEl = document.getElementById('read_content');
 
@@ -112,6 +114,9 @@ var contentSvc = function (reg) {
         self.editContentBtn = document.getElementById('edit_content_btn');
         self.editRawContentBtn = document.getElementById('edit_raw_content_btn');
         self.clearStylesBtn = document.getElementById('clear_styles_btn');
+        self.regexBlockEl = document.getElementById('regex_search_and_replace');
+        self.regexReplaceBtn = document.getElementById('regex_replace_btn');
+        self.regexHighlightBtn = document.getElementById('regex_highlight_btn');
 
         self.readEl.contentEditable = false;
 
@@ -155,6 +160,24 @@ var contentSvc = function (reg) {
             self.contentSvc.resizeIframe();
         });
 
+        // for popup window is not available
+        if (self.regexReplaceBtn) {
+            self.regexReplaceBtn.addEventListener('click', function () {
+                var search = document.getElementById('regex_pattern').value;
+                var replace = document.getElementById('regex_replace').value;
+                self.replaceContent(search, replace)
+                self.contentSvc.resizeIframe();
+            });
+        }
+
+        if (self.regexHighlightBtn) {
+            self.regexHighlightBtn.addEventListener('click', function () {
+                var search = document.getElementById('regex_pattern').value;
+                self.highlightContentMatches(search)
+                self.contentSvc.resizeIframe();
+            });
+        }
+
         if (self.iframeEl) {
             self.iframeEl.addEventListener('load', function () {
                 self.resizeIframe();
@@ -164,6 +187,49 @@ var contentSvc = function (reg) {
                 self.resizeIframe();
             });
         }
+    };
+
+    self.highlightContentMatches = function(pattern) {
+        // TODO: fix problem with edit text with HTML in Edit Content mode (not raw!)
+        var ptn;
+        var pos = pattern.lastIndexOf('/');
+
+        if (pattern[0] == '/' && pos > 0) { // is regex 
+            var replace = '<span style="background-color: orange;">$0</span>';
+            var flags = pattern.substring(pos + 1)
+            pattern = pattern.substring(1, pos);
+            ptn = new RegExp(pattern, flags);
+        } else { // plain text
+            ptn = pattern;
+            var replace = '<span style="background-color: orange;">' + self.htmlEncode(ptn) + '</span>';
+        }
+        
+        // innerText -> innerHTML - here is the problem with styles loss! No idea how to do it right
+        self.readEl.innerHTML = self.readEl.innerText.replace(ptn, replace);
+    };
+
+    self.htmlEncode = function (html) {
+        return document.createElement('a').appendChild( 
+            document.createTextNode(html)).parentNode.innerHTML;
+    }
+
+    self.replaceContent = function(pattern, replace) {
+        if (pattern == '') {
+            return; // do nothing if blank
+        }
+        
+        var ptn;
+        var pos = pattern.lastIndexOf('/');
+
+        if (pattern[0] == '/' && pos > 0) { // is regex    
+            var flags = pattern.substring(pos + 1)
+            pattern = pattern.substring(1, pos);
+            ptn = new RegExp(pattern, flags);
+        } else { // plain text
+            ptn = pattern;
+        }
+        
+        self.readEl.innerText = self.readEl.innerText.replace(ptn, replace);
     };
 
     self.resizeIframe = function () {
@@ -184,6 +250,8 @@ var contentSvc = function (reg) {
             self.editRawContentBtn.disabled = true;
             self.clearStylesBtn.disabled = true;
             self.disableOtherSvcControls(self.name);
+
+            self.enableRegexBox();
         } else {
             self.readEl.contentEditable = false;
             self.readEl.style.border = 'none';
@@ -192,6 +260,8 @@ var contentSvc = function (reg) {
             self.editRawContentBtn.disabled = false;
             self.clearStylesBtn.disabled = false;
             self.enableOtherSvcControls(self.name);
+
+            self.closeRegexBox();
         }
 
         self.resizeIframe();
@@ -212,6 +282,8 @@ var contentSvc = function (reg) {
             self.editContentBtn.disabled = true;
             self.clearStylesBtn.disabled = true;
             self.disableOtherSvcControls(self.name);
+
+            self.enableRegexBox();
         } else {
             self.readEl.contentEditable = false;
             self.readEl.style.border = 'none';
@@ -223,9 +295,23 @@ var contentSvc = function (reg) {
             self.editContentBtn.disabled = false;
             self.clearStylesBtn.disabled = false;
             self.enableOtherSvcControls(self.name);
+
+            self.closeRegexBox();
         }
 
         self.resizeIframe();
+    };
+
+    self.enableRegexBox = function () {
+        // self.regexBlockEl.style.display = 'block';
+        self.regexBlockEl.style.visibility = 'visible';
+        self.regexBlockEl.style.height = 'auto';
+    };
+
+    self.closeRegexBox = function () {
+        // self.regexBlockEl.style.display = 'none';
+        self.regexBlockEl.style.visibility = 'hidden';
+        self.regexBlockEl.style.height = '0';
     };
 
     self.clearInlineStyles = function () {
