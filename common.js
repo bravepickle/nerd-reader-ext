@@ -428,7 +428,6 @@ var editorPanelSvc = function (reg) {
         self.showBtn.addEventListener('click', function () {
             document.forms[0].style.display = 'block';
             document.forms[0].focus();
-            window.scrollTo(0, 0);
             this.style.display = 'none';
         });
     };
