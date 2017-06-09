@@ -9,6 +9,7 @@ window.addEventListener('load', function () {
     registrySvc.add(stylesSvc);
     registrySvc.add(clipboardSvc);
     registrySvc.add(pickerSvc);
+    registrySvc.add(scrollSvc);
 
     registrySvc.runAll();
 });

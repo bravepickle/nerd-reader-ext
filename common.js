@@ -490,6 +490,7 @@ var backgroundSvc = function (reg) {
     self.name = 'Background';
     self.backgroundColorEl = null;
     self.readEl = null;
+    self.editorEl = null;
     self.backgroundColorPicker = null;
     self.contentSvc = null;
 
@@ -498,6 +499,7 @@ var backgroundSvc = function (reg) {
         self.contentSvc = self.getContentSvc();
         self.readEl = self.contentSvc.readEl;
         self.backgroundColorPicker = document.getElementById('back_color_picker');
+        self.editorEl = document.getElementById('editor_block');
 
         self.bindFormEls();
         self.setRegistry(reg);
@@ -510,6 +512,9 @@ var backgroundSvc = function (reg) {
                 self.contentSvc.iframeEl.contentDocument.body.style.backgroundColor = this.value;
             }
             self.backgroundColorPicker.style.backgroundColor = this.value;
+            if (self.editorEl) {
+                self.editorEl.style.backgroundColor = this.value;
+            }
         });
     };
 
@@ -1130,3 +1135,35 @@ var pickerSvc = function (reg) {
 };
 
 pickerSvc.prototype = serviceObj;
+
+// === scrollSvc - change editor block when scrolling
+var scrollSvc = function (reg) {
+    var self = this;
+    self.name = 'Scroll';
+    self.editorEl = null;
+    self.scrollMin = 0;
+ 
+    self.init = function (reg) {
+        self.editorEl = document.getElementById('editor_block');
+
+        self.bindFormEls();
+        self.setRegistry(reg);
+    };
+
+    self.bindFormEls = function () {
+        window.addEventListener('scroll', function () {
+            var scrolled = window.scrollY;
+            if (scrolled > self.scrollMin) {
+                if (self.editorEl.className.indexOf('fixed-block') == -1) {
+                    self.editorEl.className = 'fixed-block'; // set fixed position
+                }
+            } else {
+                self.editorEl.className = ''; // make it a regular block
+            }
+        });
+    };
+
+    this.init(reg);
+};
+
+scrollSvc.prototype = serviceObj;

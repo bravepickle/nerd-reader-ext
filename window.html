@@ -44,7 +44,8 @@
         }
 
         #show_btn {
-            margin-left: 10px;
+            margin-right: 10px;
+            float: right;
         }
 
         #font_color_picker {
@@ -145,10 +146,18 @@
             width: 200px;
         }
 
+        .fixed-block {
+            position: fixed;
+            top: 0;
+            right: 0;
+            background-color: gainsboro;
+        }
+
     </style>
 </head>
 <body>
 <div class="content">
+    <div id="editor_block">
     <form class="editor_form" action="#">
         <h2>Window Editor</h2>
         <div class="form_group">
@@ -229,6 +238,7 @@
     <button style="display: none;" type="button" id="show_btn">Edit</button>
 
     <div id="custom_css_editor" style="display: none;"></div>
+    </div>
 
     <iframe id="read_window" src="iframe_window.html" frameborder="0" scrolling="no" ></iframe>
 </div>
